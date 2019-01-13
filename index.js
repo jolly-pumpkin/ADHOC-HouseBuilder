@@ -7,27 +7,14 @@ const addButton = document.getElementsByTagName('button')[0];//document.getEleme
 const submitButton = document.getElementsByTagName('button')[1];
 const myForm = document.getElementsByTagName('form')[0];
 
-
-
 //Additional Elements add via DOM
 addButton.type = 'button';//making add button a button and not the defualt form submit
-
-
-var removeButton = document.createElement("BUTTON");
-var removeLabel = document.createTextNode("remove");
-removeButton.appendChild(removeLabel);
-document.body.appendChild(removeButton);
-
-
-
-
-
-
 
 //validation
 
 //Data POCO
-function Person(age, relationship, smoker){
+function Person(id, age, relationship, smoker){
+    this.id = id;
     this.age = age;
     this.relationship = relationship;
     this.smoker = smoker;
@@ -41,11 +28,19 @@ function AddToDisplay(person)
 {
     var ol = document.getElementsByClassName("household")[0];
     var newLI = document.createElement("li");
-    var text = document.createTextNode("Age: " + person.age + " Relation: " + person.relationship + " Smoker: " + person.smoker);
-    var checkBox = document.createElement("input");
-    checkBox.type = "checkbox";
+    newLI.setAttribute("id", person.id);
+    var text = document.createTextNode("Age: " + person.age + ", Relation: " + person.relationship + ", Smoker: " + person.smoker + "   ");
+
+    var removeButton = document.createElement("button");
+    removeButton.innerHTML = "remove";
+
+    removeButton.onclick = function(){
+        HouseHold.splice(person.id, 1);
+        ol.removeChild(newLI);
+    };
+
     newLI.appendChild(text);
-    newLI.appendChild(checkBox);
+    newLI.appendChild(removeButton);
     ol.appendChild(newLI);
 }
 
@@ -57,45 +52,42 @@ function Cleanup(){
 }
 
 
-//Button click events
-removeButton.onclick = function(event){
-    alert("remove");
-};
-
 addButton.onclick = function(event){
     var age = document.getElementsByName("age")[0].value;
 
     if(isNaN(age) || age < 1){
         alert("enter real age");
     }
+    else{
+        var relationship = document.getElementsByName('rel')[0].value;
 
-    var relationship = document.getElementsByName('rel')[0].value;
-
-    /*
-    if(isNaN(relationship)){
-        alert('relationship is required');
+        /*
+        if(isNaN(relationship)){
+            alert('relationship is required');
+        }
+        */
+    
+        var smoker = document.getElementsByName('smoker')[0].checked;
+    
+    
+        var person  = new Person(HouseHold.length, age, relationship, smoker);
+    
+        console.log(person);
+    
+        HouseHold.push(person);
+    
+        console.log(HouseHold);
+    
+    
+        AddToDisplay(person);
+    
+        Cleanup();
     }
-    */
-
-    var smoker = document.getElementsByName('smoker')[0].checked;
-
-
-    var person  = new Person(age, relationship, smoker);
-
-    console.log(person);
-
-    HouseHold.push(person);
-
-    console.log(HouseHold);
-
-
-    AddToDisplay(person);
-
-    Cleanup();
 };
 
 submitButton.onclick = function(event){
     alert("submit");
+    event.preventDefault();
 };
 
     
