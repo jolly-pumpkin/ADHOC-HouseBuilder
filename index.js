@@ -1,39 +1,52 @@
 // your code goes here ...
-"use strict";
+'use strict';
 
-//Elements in HTML
-const buttons = document.getElementsByTagName('button');
-const addButton = document.getElementsByTagName('button')[0];//document.getElementsByClassName('add');
-const submitButton = document.getElementsByTagName('button')[1];
-const myForm = document.getElementsByTagName('form')[0];
+var htmlElements = {
+    addButton : document.querySelector('.add'),
+    submitButton: document.querySelector('button[type="submit"]'),
+    age: document.querySelector('input[name="age"]'),
+    rel: document.querySelector('select[name="rel"]'),
+    smoker: document.querySelector('input[name="smoker"]'),
+    householdList: document.querySelector('.household'),
+    debug: document.querySelector('.debug')
+};
 
-//Additional Elements add via DOM
-addButton.type = 'button';//making add button a button and not the defualt form submit
+//Moding the dom
+htmlElements.addButton.type = 'button';
+var ageSpan = document.createElement('span');
+htmlElements.age.parentNode.appendChild(ageSpan);
+var relSPan = document.createElement('span');
+htmlElements.rel.parentNode.appendChild(relSPan);
 
-//validation
-function ValidateAge(age){
-    if(isNaN(age) || age < 1){
-        console.log('age validation failed');
-        document.getElementsByName("age")[0].style.color = 'red'; //TODO: not showing up all the time
-        return false;
-    }else {
-        document.getElementsByName("age")[0].style.color = 'black';
-        return true;
-    }
+var errorMessageing = {
+    age: document.querySelector('input[name="age"] + span'),
+    rel: document.querySelector('select[name="rel"] + span'),
 }
 
-function ValidateRelationship(relationship){
-    var validRelationships = ['self','spouse','child','parent','grandparent','other'];
+htmlElements.addButton.onclick = function(){
+    var age = document.getElementsByName("age")[0].value;
+    var relationship = document.getElementsByName('rel')[0].value;
+    var smoker = document.getElementsByName('smoker')[0].checked;
 
-    if(!validRelationships.includes(relationship)){
-        console.log('relationship validation failed');
-        return false;
-    }else {
-        return true;
+    //do both checks so we can display both error messages if needed
+    var isAgeValid = ValidateAge(age);
+    var isRelValid = ValidateRelationship(relationship)
+
+    if( isAgeValid && isRelValid ){
+        var person  = new Person(HouseHold.length, age, relationship, smoker);
+        household.AddMember(person);
+        AddToDisplay(person);
+        Cleanup();
     }
-}
+};
 
-//Data POCO
+htmlElements.submitButton.onclick = function(event){
+    event.preventDefault();
+    ServerPost(household);
+    DisplayJson(household);
+};
+
+//Data
 function Person(id, age, relationship, smoker){
     this.id = id;
     this.age = age;
@@ -43,11 +56,9 @@ function Person(id, age, relationship, smoker){
 
 function HouseHold(){
     this.members = [];
-
     this.AddMember = function(person){
         this.members.push(person);
     }
-
     this.RemoveMember = function(id){
         this.members.splice(id, 1);
     }
@@ -55,25 +66,45 @@ function HouseHold(){
 var household = new HouseHold();
 
 
+//validation methods
+function ValidateAge(age){
+    if(isNaN(age) || age < 1){
+        errorMessageing.age.innerHTML = 'Age is invalid, please enter an age greater than 0';
+        return false;
+    }else {
+        errorMessageing.age.innerHTML = '';
+        return true;
+    }
+}
+
+function ValidateRelationship(relationship){
+    const validRelationships = ['self','spouse','child','parent','grandparent','other'];
+    if(!validRelationships.includes(relationship)){
+        errorMessageing.rel.innerHTML = ' Relationship is invalid, please select a relationship';
+        return false;
+    }else {
+        errorMessageing.rel.innerHTML = '';
+        return true;
+    }
+}
+
 //Display HouseHold
 function AddToDisplay(person){
-    var ol = document.getElementsByClassName("household")[0];
     var newLI = document.createElement("li");
     newLI.setAttribute("id", person.id);
-    var text = document.createTextNode("Age: " + person.age + ", Relation: " + person.relationship + ", Smoker: " + person.smoker + "   ");
+    var text = document.createTextNode("Age: " + person.age + ", Relation: " + person.relationship + ", Smoker: " + person.smoker);
 
     var removeButton = document.createElement("button");
     removeButton.innerHTML = "remove";
-    removeButton.style.right = 50; //TODO: fix left align
 
     removeButton.onclick = function(){
-        ol.removeChild(newLI);
+        htmlElements.householdList.removeChild(newLI);
         household.RemoveMember(person.id);
     };
 
     newLI.appendChild(text);
     newLI.appendChild(removeButton);
-    ol.appendChild(newLI);
+    htmlElements.householdList.appendChild(newLI);
 }
 
 function Cleanup(){
@@ -81,24 +112,6 @@ function Cleanup(){
     document.getElementsByName('rel')[0].value = '';
     document.getElementsByName('smoker')[0].checked= false;
 }
-
-addButton.onclick = function(){
-    var age = document.getElementsByName("age")[0].value;
-    var relationship = document.getElementsByName('rel')[0].value;
-    var smoker = document.getElementsByName('smoker')[0].checked;
-    if(ValidateAge(age) && ValidateRelationship(relationship)){
-        var person  = new Person(HouseHold.length, age, relationship, smoker);
-        household.AddMember(person);
-        AddToDisplay(person);
-        Cleanup();
-    }
-};
-
-submitButton.onclick = function(event){
-    event.preventDefault();
-    ServerPost(household);
-    DisplayJson(household);
-};
 
 function ServerPost(household){
     var request = new XMLHttpRequest();
@@ -113,5 +126,3 @@ function DisplayJson(household){
     debug.style.display = "block";
     debug.innerHTML = JSON.stringify(household.members, null, 2);
 }
-
-    
