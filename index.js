@@ -97,9 +97,18 @@ addButton.onclick = function(){
 submitButton.onclick = function(event){
     event.preventDefault();
     ServerPost(household);
+    DisplayJson(household);
 };
 
 function ServerPost(household){
+    var request = new XMLHttpRequest();
+    var data = JSON.stringify(household.members);
+    request.open('Post', '', true);
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    request.send(data);
+}
+
+function DisplayJson(household){
     var debug = document.getElementsByClassName("debug")[0];
     debug.style.display = "block";
     debug.innerHTML = JSON.stringify(household.members, null, 2);
