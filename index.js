@@ -56,8 +56,7 @@ var household = new HouseHold();
 
 
 //Display HouseHold
-function AddToDisplay(person)
-{
+function AddToDisplay(person){
     var ol = document.getElementsByClassName("household")[0];
     var newLI = document.createElement("li");
     newLI.setAttribute("id", person.id);
@@ -87,8 +86,7 @@ addButton.onclick = function(){
     var age = document.getElementsByName("age")[0].value;
     var relationship = document.getElementsByName('rel')[0].value;
     var smoker = document.getElementsByName('smoker')[0].checked;
-    if(ValidateAge(age) && ValidateRelationship(relationship))
-    {
+    if(ValidateAge(age) && ValidateRelationship(relationship)){
         var person  = new Person(HouseHold.length, age, relationship, smoker);
         household.AddMember(person);
         AddToDisplay(person);
@@ -98,21 +96,13 @@ addButton.onclick = function(){
 
 submitButton.onclick = function(event){
     event.preventDefault();
-    ServerPost(SerializeHouseHold());
+    ServerPost(household);
 };
 
-
-function SerializeHouseHold(){
-    return JSON.stringify(household.members);
-}
-
-//var debug = document.getElementsByClassName("debug")[0];
-function ServerPost(json){
-    console.log(json);
-
+function ServerPost(household){
     var debug = document.getElementsByClassName("debug")[0];
-    debug.style.display = "";
-    debug.innerHTML = "all the data!";
+    debug.style.display = "block";
+    debug.innerHTML = JSON.stringify(household.members, null, 2);
 }
 
     
