@@ -108,9 +108,9 @@ function AddToDisplay(person){
 }
 
 function Cleanup(){
-    document.getElementsByName("age")[0].value = '';
-    document.getElementsByName('rel')[0].value = '';
-    document.getElementsByName('smoker')[0].checked= false;
+    htmlElements.age.value = '';
+    htmlElements.rel.value = '';
+    htmlElements.smoker.checked= false;
 }
 
 function ServerPost(household){
